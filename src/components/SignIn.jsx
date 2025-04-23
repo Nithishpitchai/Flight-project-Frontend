@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Circles } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
+
 function SignIn() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -23,9 +25,10 @@ function SignIn() {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:5000/api/auth/signin', formData);
+      const res = await axios.post(`${API_URL}/api/auth/signin`, formData);
       toast.success(`✅ Welcome ${res.data.user.name}! Redirecting...`);
       setFormData({ email: '', password: '' });
+
       setTimeout(() => {
         navigate('/flights'); // redirect after success
       }, 1500);
@@ -40,7 +43,6 @@ function SignIn() {
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <ToastContainer />
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-
         {loading ? (
           <div className="flex justify-center items-center h-48">
             <Circles height="80" width="80" color="#4f46e5" visible={true} />
@@ -48,7 +50,6 @@ function SignIn() {
         ) : (
           <>
             <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Sign In</h2>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="email"
@@ -58,7 +59,6 @@ function SignIn() {
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-
               <input
                 type="password"
                 name="password"
@@ -67,7 +67,6 @@ function SignIn() {
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200"
@@ -77,7 +76,6 @@ function SignIn() {
             </form>
           </>
         )}
-
       </div>
     </div>
   );

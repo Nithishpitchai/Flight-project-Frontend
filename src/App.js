@@ -38,7 +38,7 @@ function App() {
       {/* Main Content */}
       <div className="flex justify-center items-center p-6">
         <Routes>
-          <Route path="/" element={<h1 className="text-4xl text-white">Welcome to Flight Booking App 🚀</h1>} />
+          <Route path="/" element={<h1 className="text-4xl text-white">Welcome to Flight Booking App🚀</h1>} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />

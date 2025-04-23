@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'https://flight-booking-backend-1-jkxo.onrender.com';
+
 function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -15,7 +17,7 @@ function Register() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', {
+      const res = await axios.post(`${API_URL}/api/auth/register`, {
         name,
         email,
         password,

@@ -1,6 +1,7 @@
-// src/pages/MyBookings.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
+const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
 
 function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -12,7 +13,7 @@ function MyBookings() {
         const token = localStorage.getItem('token');
         if (!token) return alert('You must be logged in to view bookings.');
 
-        const res = await axios.get('http://localhost:5000/api/bookings/my-bookings', {
+        const res = await axios.get(`${API_URL}/api/bookings/my-bookings`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

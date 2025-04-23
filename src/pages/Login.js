@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { saveAuth, logout } from '../utils/auth'; // ✅ import both login and logout tools
+import { saveAuth, logout } from '../utils/auth';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -12,18 +14,21 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
 
-      saveAuth(res.data.token, res.data.user); // ✅ Save login
+      saveAuth(res.data.token, res.data.user);
       alert('✅ Login successful!');
-      navigate('/dashboard'); // redirect after login
+      navigate('/dashboard');
     } catch (err) {
       alert('❌ Login failed: ' + (err.response?.data?.error || 'Unknown error'));
     }
   };
 
   const handleLogout = () => {
-    logout(); // ✅ Clear token and user
+    logout();
     alert('🚪 Logged out!');
     navigate('/login');
   };
@@ -53,7 +58,6 @@ function Login() {
         </button>
       </form>
 
-      {/* ✅ Logout Button */}
       <div className="mt-4 text-center">
         <button onClick={handleLogout} className="text-sm text-red-600 underline hover:text-red-800">
           Logout

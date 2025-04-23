@@ -1,76 +1,72 @@
-import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const stripePromise = loadStripe('YOUR_STRIPE_PUBLISHABLE_KEY');  // Replace with your real key
+const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
 
-function CheckoutForm() {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [loading, setLoading] = useState(false);
+function Payment() {
+  const [bookingData, setBookingData] = useState(null);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      toast.error('Stripe is not loaded yet. Please try again in a moment.');
-      return;
+  useEffect(() => {
+    const stored = localStorage.getItem('bookingData');
+    if (stored) {
+      setBookingData(JSON.parse(stored));
+    } else {
+      alert('❌ No booking data found!');
     }
+  }, []);
 
-    setLoading(true);
+  const handlePayment = async () => {
+    if (!bookingData) return alert('No booking data to process');
 
     try {
-      // Backend should create the payment intent securely
-      const { data } = await axios.post('/api/payment', { amount: 5000 }); // Amount in cents ($50)
+      const token = localStorage.getItem('token');
+      if (!token) return alert('Please login first');
 
-      const result = await stripe.confirmCardPayment(data.clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        },
+      // Step 1: Book the flight
+      const bookingRes = await axios.post(`${API_URL}/api/bookings/book`, bookingData, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (result.error) {
-        toast.error(`❌ Payment failed: ${result.error.message}`);
-      } else if (result.paymentIntent.status === 'succeeded') {
-        toast.success('✅ Payment successful!');
+      const booking = bookingRes.data?.booking;
+      if (!booking || !booking.totalPrice) {
+        return alert('❌ Booking failed or missing price.');
       }
-    } catch (error) {
-      toast.error(`Server Error: ${error.response?.data?.message || error.message}`);
-    } finally {
-      setLoading(false);
+
+      // Step 2: Create Stripe checkout session
+      const stripeRes = await axios.post(`${API_URL}/api/payments/create-checkout-session`, {
+        amount: booking.totalPrice,
+      });
+
+      if (stripeRes.data?.url) {
+        window.location.href = stripeRes.data.url;
+      } else {
+        alert('❌ Stripe session creation failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('❌ Payment failed: ' + (err.response?.data?.error || err.message));
     }
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl mt-10">
-      <ToastContainer />
-      <h2 className="text-2xl font-bold mb-6 text-center">Complete Payment</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="p-4 border rounded-lg">
-          <CardElement options={{ style: { base: { fontSize: '16px' } } }} />
-        </div>
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow mt-10">
+      <h2 className="text-xl font-bold mb-4">Confirm & Pay</h2>
 
-        <button
-          type="submit"
-          disabled={!stripe || loading}
-          className={`w-full p-3 rounded-lg text-white ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-          }`}
-        >
-          {loading ? 'Processing...' : 'Pay $100000'}
-        </button>
-      </form>
+      {bookingData && (
+        <div className="mb-4">
+          <p><strong>Passenger:</strong> {bookingData.passengers[0].name}</p>
+          <p><strong>Amount:</strong> ${bookingData.totalPrice}</p>
+        </div>
+      )}
+
+      <button
+        onClick={handlePayment}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Pay with Stripe
+      </button>
     </div>
   );
 }
 
-export default function Payment() {
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm />
-    </Elements>
-  );
-}
+export default Payment;
