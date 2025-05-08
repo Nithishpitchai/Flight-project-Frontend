@@ -1,4 +1,3 @@
-// src/components/SignUp.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,8 @@ function SignUp() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://flight-booking-backend-1-jkxo.onrender.com/api/auth/signup', {
+      const API_URL = process.env.REACT_APP_BACKEND_URL; // Use backend URL from environment variables
+      const res = await axios.post(`${API_URL}/api/auth/signup`, {
         name,
         email,
         password,

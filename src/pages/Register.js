@@ -1,20 +1,31 @@
-// src/pages/Register.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { saveAuth, getUser } from '../utils/auth';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'https://flight-booking-backend-1-jkxo.onrender.com';
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 function Register() {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (getUser()) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
+
+    if (password !== confirmPassword) {
+      alert("❌ Passwords don't match!");
+      return;
+    }
 
     try {
       const res = await axios.post(`${API_URL}/api/auth/register`, {
@@ -23,43 +34,52 @@ function Register() {
         password,
       });
 
-      alert('✅ Registered successfully!');
-      navigate('/login'); // Redirect to login after successful registration
+      saveAuth(res.data.token, res.data.user);
+      alert('✅ Registration successful!');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong.');
+      const errorMsg = err.response?.data?.message || 'Registration failed';
+      alert(`❌ ${errorMsg}`);
     }
   };
 
   return (
     <div className="p-6 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Register</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
       <form onSubmit={handleRegister}>
         <input
-          type="text"
-          placeholder="Name"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
           className="w-full p-2 mb-3 border rounded"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
           required
         />
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name"
           className="w-full p-2 mb-3 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
-          className="w-full p-2 mb-4 border rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full p-2 mb-3 border rounded"
           required
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          className="w-full p-2 mb-4 border rounded"
+          required
+        />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">
           Register
         </button>
       </form>

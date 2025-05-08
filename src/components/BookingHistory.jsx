@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
-
 function BookingHistory() {
   const [bookings, setBookings] = useState([]);
 
@@ -12,6 +10,7 @@ function BookingHistory() {
         const token = localStorage.getItem('token');
         if (!token) return alert('Please log in to view your bookings.');
 
+        const API_URL = process.env.REACT_APP_BACKEND_URL; // Use environment variable for backend URL
         const res = await axios.get(`${API_URL}/api/bookings/my-bookings`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -31,6 +30,7 @@ function BookingHistory() {
 
     try {
       const token = localStorage.getItem('token');
+      const API_URL = process.env.REACT_APP_BACKEND_URL; // Use environment variable for backend URL
       await axios.delete(`${API_URL}/api/bookings/cancel/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

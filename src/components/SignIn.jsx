@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Circles } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 function SignIn() {
   const [formData, setFormData] = useState({ email: '', password: '' });

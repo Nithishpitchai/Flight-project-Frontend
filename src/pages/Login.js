@@ -1,8 +1,8 @@
-// src/pages/Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { saveAuth, logout } from '../utils/auth';
+import { saveAuth } from '../utils/auth';
+import { getUser } from '../utils/auth';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -10,6 +10,13 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (getUser()) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,16 +28,10 @@ function Login() {
 
       saveAuth(res.data.token, res.data.user);
       alert('✅ Login successful!');
-      navigate('/dashboard');
+      navigate('/dashboard'); // Redirect to dashboard after login
     } catch (err) {
       alert('❌ Login failed: ' + (err.response?.data?.error || 'Unknown error'));
     }
-  };
-
-  const handleLogout = () => {
-    logout();
-    alert('🚪 Logged out!');
-    navigate('/login');
   };
 
   return (
@@ -57,12 +58,6 @@ function Login() {
           Login
         </button>
       </form>
-
-      <div className="mt-4 text-center">
-        <button onClick={handleLogout} className="text-sm text-red-600 underline hover:text-red-800">
-          Logout
-        </button>
-      </div>
     </div>
   );
 }

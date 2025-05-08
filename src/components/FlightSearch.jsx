@@ -10,7 +10,8 @@ function FlightSearch({ onSelectFlight }) {
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(`https://flight-booking-backend-1-jkxo.onrender.com/api/flights/search`, {
+      const API_URL = process.env.REACT_APP_BACKEND_URL; // Use environment variable for backend URL
+      const res = await axios.get(`${API_URL}/api/flights/search`, {
         params: { origin, destination, date },
       });
       setFlights(res.data.data); // ✅ FIX: access res.data.data

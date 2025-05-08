@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://flight-booking-backend-1-jkxo.onrender.com';
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 function MyBookings() {
   const [bookings, setBookings] = useState([]);

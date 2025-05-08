@@ -1,38 +1,43 @@
-// src/pages/Dashboard.js
-import React, { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
-import { logout } from '../utils/auth';
+import React from 'react';
+import { getUser, logout } from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
-  const { user } = useContext(UserContext);
+function Dashboard() {
+  const user = getUser();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    alert('🚪 Logged out!');
     navigate('/login');
   };
 
-  return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      {user ? (
-        <div>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+  if (!user) {
+    return (
+      <div className="p-6 max-w-md mx-auto text-center">
+        <h2 className="text-xl font-bold mb-2">Not logged in</h2>
+        <button
+          onClick={() => navigate('/login')}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
 
-          <button
-            onClick={handleLogout}
-            className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
-        <p>User not found. Please log in again.</p>
-      )}
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">👋 Welcome, {user.name}</h2>
+      <p className="mb-4 text-gray-700">Email: {user.email}</p>
+      <button
+        onClick={handleLogout}
+        className="bg-red-600 text-white px-4 py-2 rounded w-full"
+      >
+        Logout
+      </button>
     </div>
   );
-};
+}
 
 export default Dashboard;
