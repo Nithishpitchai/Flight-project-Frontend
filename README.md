@@ -23,9 +23,3 @@ A modern flight reservation web application built with the MERN stack. Users can
 
 ---
 
-## 🚀 Getting Started
-
-### 1️⃣ Clone the Repo
-```bash
-git clone https://github.com/YOUR_USERNAME/Flight-project-Frontend.git
-cd Flight-project-Frontend
